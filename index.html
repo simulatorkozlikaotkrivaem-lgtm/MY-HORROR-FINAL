@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STV NIGHTS - Gold Update</title>
+<title>STV NIGHTS - Gold Update FIX</title>
 <style>
   body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: monospace; overflow: hidden; user-select: none; touch-action: manipulation; }
   #game-window { width: 800px; height: 450px; position: relative; background: #000; border: 2px solid #333; overflow: hidden; }
   .screen { position: absolute; inset: 0; display: flex; z-index: 100; }
   .hidden { display: none !important; }
   
-  /* МЕНЮ */
   #main-menu { background: black; z-index: 1000; flex-direction: column; }
   .menu-content { width: 50%; padding: 40px; z-index: 1100; }
   .title-text { font-size: 50px; line-height: 0.9; margin-bottom: 5px; color: #f00; text-shadow: 0 0 10px red; }
@@ -19,7 +18,6 @@
   .menu-btn:hover { color: #f00; }
   .freddy-bg { position: absolute; right: 0; width: 50%; height: 100%; background: url('https://i.imgur.com/8QpYhPj.png') center/cover; filter: grayscale(1) contrast(200%); z-index: 1050; }
 
-  /* ОФИС */
   .room { background: #1a1a1a; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://www.transparenttextures.com/patterns/dark-matter.png'), repeating-linear-gradient(90deg, #222 0, #222 80px, #1a1a1a 81px); }
   .dust-container { position: absolute; inset: 0; pointer-events: none; z-index: 100; opacity: 0.3; }
   .dust { position: absolute; background: white; border-radius: 50%; opacity: 0.2; animation: float 10s infinite linear; }
@@ -30,14 +28,13 @@
   .bulb { width: 40px; height: 40px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px #fff; animation: flicker 0.15s infinite; }
   @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-  /* РАДОСТЬ */
   #hallucination { position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; display: none; pointer-events: none; }
   .joy-unit { position: absolute; font-weight: bold; color: white; animation: shake 0.05s infinite; text-shadow: 0 0 10px white; font-size: 30px; }
   @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
 
   .game-ui { position: absolute; top: 10px; width: 100%; padding: 0 20px; z-index: 9100; pointer-events: none; }
   .side-controls { position: absolute; bottom: 50px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 150; }
-  .c-btn { width: 100px; height: 50px; background: #111; color: #555; border: 2px solid #222; cursor: pointer; font-weight: bold; }
+  .c-btn { width: 100px; height: 50px; background: #111; color: #555; border: 2px solid #222; cursor: pointer; font-weight: bold; pointer-events: auto; }
   .c-btn.on-door { background: #600 !important; color: #f00 !important; }
   .c-btn.on-light { background: #660 !important; color: #ff0 !important; }
 
@@ -49,7 +46,6 @@
   #mask-overlay.active { transform: translateY(0); }
   #mask-btn { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 60px; border: 2px solid red; background: rgba(0,0,0,0.8); color: red; font-weight: bold; cursor: pointer; z-index: 9500; display: none; justify-content: center; align-items: center; }
 
-  /* СКРИМЕРЫ */
   #red-jumpscare { position: absolute; inset: 0; background: #000; z-index: 19000; display: none; overflow: hidden; }
   .scare-eyes { position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 700px; height: 300px; display: flex; justify-content: space-around; animation: fastJump 0.2s forwards; }
   .scare-eye { width: 280px; height: 280px; background: red; border-radius: 50%; box-shadow: 0 0 120px red; }
@@ -69,7 +65,7 @@
       <button class="menu-btn" onclick="goLoad(1)">Start</button>
       <button id="btn-n2" class="menu-btn hidden" style="color: gold;" onclick="goLoad(2)">Night 2</button>
       <button class="menu-btn" onclick="location.reload()">Leave</button>
-      <div style="font-size:10px; opacity:0.3; margin-top:20px;">v 1.5 - GOLD STABLE</div>
+      <div style="font-size:10px; opacity:0.3; margin-top:20px;">v 1.6 - GOLD STABLE FIX</div>
     </div>
     <div class="freddy-bg"></div>
   </div>
@@ -112,7 +108,7 @@
       <div id="gate-r" class="gate"></div>
       <div id="light-r" class="light-flash"></div>
       <div class="side-controls">
-        <button id="b-door-r" class="c-btn" onclick="event.stopPropagation(); doAction('rDoor')})">door</button>
+        <button id="b-door-r" class="c-btn" onclick="event.stopPropagation(); doAction('rDoor')">door</button>
         <button id="b-light-r" class="c-btn" onclick="event.stopPropagation(); doAction('rLight')">light</button>
       </div>
     </div>
@@ -129,7 +125,6 @@
   let s = { lDoor: false, rDoor: false, lLight: false, rLight: false };
   let intervals = [], AC, fan;
 
-  // Пыль
   for(let i=0; i<30; i++) {
     let d = document.createElement('div'); d.className = 'dust';
     d.style.left = Math.random()*100+'%'; d.style.top = Math.random()*100+'%';
