@@ -3,131 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STV NIGHTS: GOLD EDITION FINAL</title>
+<title>STV NIGHTS - JOY EDITION</title>
 <style>
-  body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: 'Courier New', Courier, monospace; overflow: hidden; user-select: none; touch-action: manipulation; }
-  #game-window { width: 800px; height: 450px; position: relative; background: #000; border: 2px solid #333; overflow: hidden; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
+  body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: monospace; overflow: hidden; user-select: none; touch-action: manipulation; }
+  #game-window { width: 800px; height: 450px; position: relative; background: #000; border: 2px solid #333; overflow: hidden; }
   
-  /* СЛОИ И ЭКРАНЫ */
   .screen { position: absolute; inset: 0; display: flex; z-index: 100; }
   .hidden { display: none !important; }
-  #dark-overlay { position: absolute; inset: 0; background: black; opacity: 0; pointer-events: none; z-index: 10000; transition: opacity 2s; }
-  #power-out-overlay { position: absolute; inset: 0; background: rgba(0, 0, 50, 0.8); z-index: 18000; display: none; pointer-events: none; }
-
-  /* МЕНЮ - КНОПКИ ТЕПЕРЬ КЛИКАЮТСЯ ВСЕГДА */
-  #main-menu { background: black; z-index: 2000; flex-direction: column; }
-  .menu-content { width: 60%; padding: 40px; position: relative; z-index: 2100; }
-  .title-text { font-size: 60px; line-height: 0.9; margin-bottom: 30px; color: #f00; text-shadow: 0 0 15px red; font-weight: bold; }
-  .menu-btn { font-size: 40px; cursor: pointer; margin-bottom: 15px; display: block; border: none; background: none; color: white; text-align: left; font-family: inherit; transition: 0.2s; pointer-events: auto !important; }
-  .menu-btn:hover { color: #f00; transform: scale(1.05); }
-  .freddy-bg { position: absolute; right: 0; width: 55%; height: 100%; background: url('https://i.imgur.com/8QpYhPj.png') center/cover; filter: grayscale(1) contrast(150%) brightness(0.6); z-index: 2050; }
+  
+  /* МЕНЮ */
+  #main-menu { background: black; z-index: 1000; flex-direction: column; }
+  .menu-content { width: 50%; padding: 40px; z-index: 1100; }
+  .title-text { font-size: 50px; line-height: 0.9; margin-bottom: 30px; color: #f00; text-shadow: 0 0 10px red; }
+  .menu-btn { font-size: 40px; cursor: pointer; margin-bottom: 15px; display: block; border:none; background:none; color:white; text-align:left; font-family:inherit; pointer-events: auto !important; }
+  .menu-btn:hover { color: #f00; }
+  .freddy-bg { position: absolute; right: 0; width: 50%; height: 100%; background: url('https://i.imgur.com/8QpYhPj.png') center/cover; filter: grayscale(1) contrast(200%); z-index: 1050; }
 
   /* ОФИС */
-  #night-screen { z-index: 50; flex-direction: column; }
-  .room { background: #1a1a1a; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://www.transparenttextures.com/patterns/dark-matter.png'), repeating-linear-gradient(90deg, #222 0, #222 80px, #1a1a1a 81px); width: 100%; height: 100%; position: absolute; }
-  .lamp-fixture { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 200; pointer-events: none; }
-  .bulb { width: 40px; height: 40px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px #fff; animation: flicker 0.15s infinite; }
-  @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-
-  /* ДВЕРИ И СВЕТ */
-  .gate { position: absolute; inset: 0; z-index: 10; transform: translateY(-100%); transition: transform 0.2s steps(6); pointer-events: none; background: repeating-linear-gradient(90deg, #333, #333 30px, #444 40px); border-bottom: 15px solid #222; }
-  .gate.closed { transform: translateY(0); }
-  .light-flash { position: absolute; inset: 0; background: rgba(255,255,255,0.25); visibility: hidden; z-index: 5; box-shadow: inset 0 0 150px #fff; }
-  .monster-eyes { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 6; }
-  .eye { width: 20px; height: 20px; background: red; border-radius: 50%; box-shadow: 0 0 20px red; display: inline-block; margin: 0 15px; }
-
-  /* МАСКА */
-  #mask-overlay { position: absolute; inset: 0; z-index: 9000; pointer-events: none; background: radial-gradient(circle at 35% 45%, transparent 60px, rgba(45, 27, 24, 0.99) 70px), radial-gradient(circle at 65% 45%, transparent 60px, rgba(45, 27, 24, 0.99) 70px); background-color: rgba(45, 27, 24, 0.99); transform: translateY(-110%); transition: transform 0.3s ease-in-out; }
-  #mask-overlay.active { transform: translateY(0); }
-  #mask-btn { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); padding: 15px 40px; border: 2px solid red; background: rgba(0,0,0,0.8); color: red; font-weight: bold; cursor: pointer; z-index: 9500; display: none; }
-
-  /* СКРИМЕРЫ */
-  #red-jumpscare { position: absolute; inset: 0; background: #000; z-index: 20000; display: none; justify-content: center; align-items: center; }
-  .scare-eye-big { width: 250px; height: 250px; background: red; border-radius: 50%; box-shadow: 0 0 100px red; animation: shake 0.1s infinite; }
-  @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
+  .room { background: #1a1a1a; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://www.transparenttextures.com/patterns/dark-matter.png'), repeating-linear-gradient(90deg, #222 0, #222 80px, #1a1a1a 81px); }
   
-  #mendo-scare { position: absolute; inset: 0; z-index: 15000; display: none; background: #000; }
-  .mendo-jump { position: absolute; left: 50%; bottom: -100px; transform: translateX(-50%); animation: mendoFly 0.5s forwards; }
-  @keyframes mendoFly { to { bottom: 150px; transform: translateX(-50%) scale(3); } }
+  /* ПЫЛЬ */
+  .dust-container { position: absolute; inset: 0; pointer-events: none; z-index: 100; opacity: 0.3; }
+  .dust { position: absolute; background: white; border-radius: 50%; opacity: 0.2; animation: float 10s infinite linear; }
+  @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(-30px, 60px); } }
 
-  /* ПОБЕДА */
-  #win-screen { background: black; z-index: 30000; display: none; justify-content: center; align-items: center; flex-direction: column; }
-  .win-text { font-size: 100px; color: white; text-shadow: 0 0 20px white; }
+  /* ЛАМПОЧКА */
+  .lamp-fixture { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 200; pointer-events: none; }
+  .chain { width: 4px; height: 50px; background: #333; margin: 0 auto; background-image: repeating-linear-gradient(0deg, #111, #111 5px, #444 7px); }
+  .bulb { width: 40px; height: 40px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px #fff; animation: flicker 0.15s infinite; }
+  @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-  /* UI */
-  .game-ui { position: absolute; top: 10px; width: 100%; padding: 0 20px; z-index: 9100; pointer-events: none; display: flex; justify-content: space-between; }
-  .side-controls { position: absolute; bottom: 40px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 150; }
-  .c-btn { width: 90px; height: 45px; background: #222; color: #777; border: 2px solid #444; cursor: pointer; font-weight: bold; pointer-events: auto; }
-  .c-btn.on-door { background: #800 !important; color: #f00 !important; border-color: #f00; }
-  .c-btn.on-light { background: #880 !important; color: #ff0 !important; border-color: #ff0; }
+  /* ГАЛЛЮЦИНАЦИИ "РАДОСТЬ" */
+  #hallucination { position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 8000; display: none; pointer-events: none; }
+  .joy-unit { position: absolute; font-weight: bold; color: white; animation: shake 0.05s infinite; text-shadow: 0 0 10px white; font-size: 30px; }
+  @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
+
+  .game-ui { position: absolute; top: 10px; width: 100%; padding: 0 20px; z-index: 9100; pointer-events: none; }
+  .side-controls { position: absolute; bottom: 50px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 150; }
+  .c-btn { width: 100px; height: 50px; background: #111; color: #555; border: 2px solid #222; cursor: pointer; font-weight: bold; pointer-events: auto; }
+  .c-btn.on-door { background: #600 !important; color: #f00 !important; }
+  .c-btn.on-light { background: #660 !important; color: #ff0 !important; }
+
+  .gate { position: absolute; inset: 0; z-index: 10; transform: translateY(-100%); transition: transform 0.15s steps(5); pointer-events: none; background: repeating-linear-gradient(90deg, transparent, transparent 30px, #333 30px, #444 40px); border-bottom: 15px solid #222; }
+  .gate.closed { transform: translateY(0); }
+  .light-flash { position: absolute; inset: 0; background: rgba(255,255,255,0.2); visibility: hidden; z-index: 2; box-shadow: inset 0 0 150px #fff; }
+  .monster-eyes { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 5; }
+  .eye { width: 25px; height: 25px; background: red; border-radius: 50%; box-shadow: 0 0 25px red; display: inline-block; margin: 0 15px; }
+
+  #mask-overlay { position: absolute; inset: 0; z-index: 9000; pointer-events: none; background: rgba(45, 27, 24, 0.9); transform: translateY(-110%); transition: transform 0.3s; }
+  #mask-overlay.active { transform: translateY(0); }
+  #mask-btn { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 60px; border: 2px solid red; background: rgba(0,0,0,0.8); color: red; font-weight: bold; cursor: pointer; z-index: 9500; display: none; justify-content: center; align-items: center; }
+
+  #red-jumpscare { position: absolute; inset: 0; background: #000; z-index: 19000; display: none; overflow: hidden; }
+  .scare-eyes { position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 700px; height: 300px; display: flex; justify-content: space-around; animation: fastJump 0.2s forwards; }
+  .scare-eye { width: 280px; height: 280px; background: red; border-radius: 50%; box-shadow: 0 0 120px red; }
+  @keyframes fastJump { to { bottom: 50px; transform: translateX(-50%) scale(2.2); } }
+  #win-screen { background: black; z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+  .eight-bit-text { font-size: 80px; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div id="game-window">
-  <div id="dark-overlay"></div>
-  <div id="power-out-overlay"></div>
-
   <div id="main-menu" class="screen">
     <div class="menu-content">
-      <div class="title-text">STV<br>NIGHTS</div>
-      <button class="menu-btn" onclick="goLoad(1)">> NEW GAME</button>
-      <button id="btn-n2" class="menu-btn hidden" style="color: gold;" onclick="goLoad(2)">> NIGHT 2</button>
-      <button class="menu-btn" onclick="location.reload()">> EXIT</button>
-      <div style="font-size:12px; color:#555; margin-top:30px;">v1.3.5 GOLD - STABLE</div>
+      <div class="title-text">STV NIGHTS</div>
+      <button class="menu-btn" onclick="goLoad(1)">Start</button>
+      <button id="btn-n2" class="menu-btn hidden" style="color: gold;" onclick="goLoad(2)">Night 2</button>
+      <button class="menu-btn" onclick="location.reload()">Leave</button>
+      <div style="font-size:10px; opacity:0.3; margin-top:20px;">v 1.3 GOLD - JOY</div>
     </div>
     <div class="freddy-bg"></div>
   </div>
 
   <div id="loading-screen" class="screen hidden" style="background:black; justify-content:center; align-items:center;">
-    <div id="load-label" style="font-size:50px;">NIGHT 1</div>
+    <div id="load-label" style="font-size:60px;">Ночь 1</div>
   </div>
 
   <div id="night-screen" class="screen hidden">
+    <div id="hallucination"></div>
     <div class="game-ui">
-      <div>POWER: <span id="p-val">100</span>%</div>
-      <div id="night-info">NIGHT 1 - <span id="t-val">12 AM</span></div>
+      <div>Аккумулятор — <span id="p-val">100</span>%</div>
+      <div id="night-label">Ночь 1<br><span id="t-val">12 am</span></div>
     </div>
 
-    <div id="view-center" class="view active-view room">
-      <div class="lamp-fixture"><div class="bulb"></div></div>
-      <div id="mendo-eyes" style="position:absolute; top:40%; left:50%; transform:translateX(-50%); display:none;">
-          <div style="width:25px; height:25px; background:gold; border-radius:50%; box-shadow:0 0 20px gold; display:inline-block; margin:0 20px;"></div>
-          <div style="width:25px; height:25px; background:gold; border-radius:50%; box-shadow:0 0 20px gold; display:inline-block; margin:0 20px;"></div>
+    <div id="dust-box" class="dust-container"></div>
+
+    <div id="view-center" class="view active-view room" style="width:100%; height:100%; position:absolute;">
+      <div class="lamp-fixture"><div class="chain"></div><div class="bulb"></div></div>
+      <div id="mendo-eyes" style="position:absolute; top:40%; left:50%; transform:translateX(-50%); display:none; z-index:400;">
+          <div style="width:30px; height:30px; background:gold; border-radius:50%; box-shadow:0 0 30px gold; display:inline-block; margin:0 20px;"></div>
+          <div style="width:30px; height:30px; background:gold; border-radius:50%; box-shadow:0 0 30px gold; display:inline-block; margin:0 20px;"></div>
       </div>
-      <div onclick="setView('left')" style="position:absolute; left:0; width:25%; height:100%; cursor:pointer; z-index:100;"></div>
-      <div onclick="setView('right')" style="position:absolute; right:0; width:25%; height:100%; cursor:pointer; z-index:100;"></div>
+      <div onclick="setView('left')" style="position:absolute; left:0; width:30%; height:100%; cursor:pointer; z-index:100;"></div>
+      <div onclick="setView('right')" style="position:absolute; right:0; width:30%; height:100%; cursor:pointer; z-index:100;"></div>
       <div id="mask-btn" onclick="toggleMask()">▲ MASK ▲</div>
     </div>
 
-    <div id="view-left" class="view hidden room">
+    <div id="view-left" class="view hidden room" style="width:100%; height:100%; position:absolute;">
       <div onclick="setView('center')" style="position:absolute; inset:0; z-index:1;"></div>
       <div id="gate-l" class="gate"></div>
       <div id="light-l" class="light-flash"></div>
       <div id="monster-l" class="monster-eyes"><div class="eye"></div><div class="eye"></div></div>
       <div class="side-controls">
-        <button id="b-door-l" class="c-btn" onclick="event.stopPropagation(); doAction('lDoor')">DOOR</button>
-        <button id="b-light-l" class="c-btn" onclick="event.stopPropagation(); doAction('lLight')">LIGHT</button>
+        <button id="b-door-l" class="c-btn" onclick="event.stopPropagation(); doAction('lDoor')">door</button>
+        <button id="b-light-l" class="c-btn" onclick="event.stopPropagation(); doAction('lLight')">light</button>
       </div>
     </div>
 
-    <div id="view-right" class="view hidden room">
+    <div id="view-right" class="view hidden room" style="width:100%; height:100%; position:absolute;">
       <div onclick="setView('center')" style="position:absolute; inset:0; z-index:1;"></div>
       <div id="gate-r" class="gate"></div>
       <div id="light-r" class="light-flash"></div>
       <div id="monster-r" class="monster-eyes"><div class="eye"></div><div class="eye"></div></div>
       <div class="side-controls">
-        <button id="b-door-r" class="c-btn" onclick="event.stopPropagation(); doAction('rDoor')">DOOR</button>
-        <button id="b-light-r" class="c-btn" onclick="event.stopPropagation(); doAction('rLight')">LIGHT</button>
+        <button id="b-door-r" class="c-btn" onclick="event.stopPropagation(); doAction('rDoor')">door</button>
+        <button id="b-light-r" class="c-btn" onclick="event.stopPropagation(); doAction('rLight')">light</button>
       </div>
     </div>
 
     <div id="mask-overlay"></div>
   </div>
 
-  <div id="win-screen" class="screen"><div class="win-text">6:00 AM</div></div>
-  <div id="red-jumpscare" class="screen"><div class="scare-eye-big"></div><div class="scare-eye-big"></div></div>
-  <div id="mendo-scare" class="screen"><div class="mendo-jump"><div class="eye" style="background:gold; width:50px; height:50px;"></div><div class="eye" style="background:gold; width:50px; height:50px;"></div></div></div>
+  <div id="red-jumpscare"><div class="scare-eyes"><div class="scare-eye"></div><div class="scare-eye"></div></div></div>
+  <div id="win-screen"><div class="eight-bit-text">6:00</div></div>
 </div>
 
 <script>
@@ -136,27 +135,34 @@
   let s = { lDoor: false, rDoor: false, lLight: false, rLight: false };
   let intervals = [], AC, fan;
 
+  // Создаем пылинки
+  for(let i=0; i<30; i++) {
+    let d = document.createElement('div'); d.className = 'dust';
+    d.style.left = Math.random()*100+'%'; d.style.top = Math.random()*100+'%';
+    d.style.width = d.style.height = Math.random()*3+2+'px';
+    document.getElementById('dust-box').appendChild(d);
+  }
+
   if(localStorage.getItem('night1Win')) document.getElementById('btn-n2').classList.remove('hidden');
 
-  function goLoad(n) {
-    curNight = n;
-    document.getElementById('main-menu').classList.add('hidden');
-    document.getElementById('loading-screen').classList.remove('hidden');
-    document.getElementById('load-label').innerText = "NIGHT " + n;
-    
-    // Попытка запустить звук
+  function initSound() {
     try {
       AC = new (window.AudioContext || window.webkitAudioContext)();
-      fan = AC.createGain();
-      let osc = AC.createOscillator();
-      osc.type = 'sawtooth'; osc.frequency.value = 40;
-      fan.gain.value = 0.03; osc.connect(fan); fan.connect(AC.destination); osc.start();
+      fan = AC.createGain(); let osc = AC.createOscillator();
+      osc.type = 'sawtooth'; osc.frequency.value = 40; fan.gain.value = 0.02;
+      osc.connect(fan); fan.connect(AC.destination); osc.start();
     } catch(e) {}
+  }
 
+  function goLoad(n) {
+    curNight = n; initSound();
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('loading-screen').classList.remove('hidden');
+    document.getElementById('load-label').innerText = "Ночь " + n;
     setTimeout(() => {
       document.getElementById('loading-screen').classList.add('hidden');
       document.getElementById('night-screen').classList.remove('hidden');
-      document.getElementById('mask-btn').style.display = (n >= 2) ? 'block' : 'none';
+      document.getElementById('mask-btn').style.display = (n >= 2) ? 'flex' : 'none';
       start();
     }, 2000);
   }
@@ -165,8 +171,7 @@
     if(isDead || isWin || maskOn || power <= 0) return;
     document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
     document.getElementById('view-' + v).classList.remove('hidden');
-    s.lLight = s.rLight = false;
-    upd();
+    s.lLight = s.rLight = false; upd();
   }
 
   function doAction(t) {
@@ -183,6 +188,17 @@
     if(maskOn && mendoActive) { mendoActive = false; document.getElementById('mendo-eyes').style.display = 'none'; }
   }
 
+  function triggerJoy() {
+    const h = document.getElementById('hallucination');
+    h.innerHTML = ''; h.style.display = 'block';
+    for(let i=0; i<10; i++) {
+        let j = document.createElement('div'); j.className = 'joy-unit';
+        j.innerText = 'РАДОСТЬ'; j.style.left = Math.random()*70+'%'; j.style.top = Math.random()*80+'%';
+        h.appendChild(j);
+    }
+    setTimeout(() => h.style.display = 'none', 300);
+  }
+
   function upd() {
     document.getElementById('gate-l').classList.toggle('closed', s.lDoor);
     document.getElementById('gate-r').classList.toggle('closed', s.rDoor);
@@ -190,69 +206,63 @@
     document.getElementById('light-r').style.visibility = s.rLight ? 'visible' : 'hidden';
     document.getElementById('monster-l').style.display = (s.lLight && monsterSide === 'l') ? 'block' : 'none';
     document.getElementById('monster-r').style.display = (s.rLight && monsterSide === 'r') ? 'block' : 'none';
-    
-    document.getElementById('b-door-l').className = 'c-btn' + (s.lDoor ? ' on-door' : '');
-    document.getElementById('b-door-r').className = 'c-btn' + (s.rDoor ? ' on-door' : '');
-    document.getElementById('b-light-l').className = 'c-btn' + (s.lLight ? ' on-light' : '');
-    document.getElementById('b-light-r').className = 'c-btn' + (s.rLight ? ' on-light' : '');
+    document.getElementById('b-door-l').className = 'c-btn' + (s.lDoor?' on-door':'');
+    document.getElementById('b-door-r').className = 'c-btn' + (s.rDoor?' on-door':'');
+    document.getElementById('b-light-l').className = 'c-btn' + (s.lLight?' on-light':'');
+    document.getElementById('b-light-r').className = 'c-btn' + (s.rLight?' on-light':'');
   }
 
   function start() {
-    // ЭНЕРГИЯ
     intervals.push(setInterval(() => {
       if(isDead || isWin) return;
-      let drain = 0.2 + (s.lDoor?0.3:0) + (s.rDoor?0.3:0) + (s.lLight||s.rLight?0.2:0) + (maskOn?0.1:0);
-      power -= drain;
+      power -= (0.15 + (s.lDoor?0.3:0) + (s.rDoor?0.3:0));
       document.getElementById('p-val').innerText = Math.max(0, Math.floor(power));
-      if(power <= 0) diePower();
+      if(power <= 0) die();
+      if(Math.random() < 0.01) triggerJoy();
     }, 1000));
 
-    // МОНСТРЫ В ДВЕРЯХ
     intervals.push(setInterval(() => {
       if(isDead || isWin || monsterSide || power <= 0) return;
-      if(Math.random() < 0.4) {
+      if(Math.random() < 0.35) {
         monsterSide = Math.random() > 0.5 ? 'l' : 'r';
         setTimeout(() => {
-          if(!isWin && !isDead && monsterSide && !s[monsterSide + 'Door']) dieRed();
+          if(!isWin && !isDead && monsterSide && !s[monsterSide + 'Door']) die();
           else { monsterSide = null; upd(); }
-        }, 4000);
+        }, 3800);
       }
     }, 7000));
 
-    // МЭНДО (НОЧЬ 2)
     if(curNight >= 2) {
       intervals.push(setInterval(() => {
-        if(isDead || isWin || mendoActive || maskOn || power <= 0) return;
-        if(Math.random() < 0.25) {
-          mendoActive = true;
-          document.getElementById('mendo-eyes').style.display = 'block';
-          setTimeout(() => { if(mendoActive && !maskOn) dieMendo(); }, 3500);
+        if(isDead || isWin || mendoActive || maskOn) return;
+        if(Math.random() < 0.2) {
+          mendoActive = true; document.getElementById('mendo-eyes').style.display = 'block';
+          setTimeout(() => { if(mendoActive && !maskOn) die(); }, 3000);
         }
-      }, 9000));
+      }, 8500));
     }
 
-    // ЧАСЫ (45 сек = 1 час)
     intervals.push(setInterval(() => {
-      if(isDead || isWin || power <= 0) return;
+      if(isDead || isWin) return;
       hour++;
-      if(hour <= 6) document.getElementById('t-val').innerText = hour + " AM";
+      if(hour <= 6) document.getElementById('t-val').innerText = hour + " am";
       if(hour === 6) win();
     }, 45000));
   }
 
-  function dieRed() { if(isWin || isDead) return; isDead = true; stop(); document.getElementById('red-jumpscare').style.display = 'flex'; setTimeout(() => location.reload(), 2000); }
-  function dieMendo() { if(isWin || isDead) return; isDead = true; stop(); document.getElementById('mendo-scare').style.display = 'block'; setTimeout(() => location.reload(), 1000); }
-  function diePower() { if(isWin || isDead) return; isDead = true; stop(); document.getElementById('power-out-overlay').style.display = 'block'; setTimeout(dieRed, 4000); }
-  
+  function die() {
+    isDead = true; intervals.forEach(clearInterval);
+    if(fan) fan.gain.value = 0;
+    document.getElementById('red-jumpscare').style.display = 'block';
+    setTimeout(() => location.reload(), 2000);
+  }
+
   function win() {
-    isWin = true; stop();
+    isWin = true; intervals.forEach(clearInterval);
     localStorage.setItem('night' + curNight + 'Win', 'true');
     document.getElementById('win-screen').style.display = 'flex';
     setTimeout(() => location.reload(), 5000);
   }
-
-  function stop() { intervals.forEach(clearInterval); if(fan) fan.gain.value = 0; }
 </script>
 </body>
 </html>
-
